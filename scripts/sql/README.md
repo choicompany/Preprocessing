@@ -3,10 +3,28 @@
 여기는 SQL에서 데이터를 추출/적재할 때 쓰는 쿼리 템플릿을 두는 곳입니다.
 
 ## 추출 흐름(권장)
-1. 필요한 컬럼/필터를 `extract.sql`에 작성
-2. DB 클라이언트로 CSV로 export
-3. export한 CSV를 `data/raw/`에 저장(로컬)
+1. 필요한 컬럼/필터를 `extract_mysql.sql`에 작성
+2. PowerShell로 로컬 CSV 추출(아래 예시)
+3. 추출된 CSV를 `data/raw/`에 저장(로컬)
 4. `scripts/run_preprocess.ps1`로 전처리 실행
+
+### MySQL 로컬 CSV 추출 예시
+
+1) 환경변수 세팅(비밀번호는 커맨드 히스토리에 남지 않게 환경변수 권장)
+
+```powershell
+$env:MYSQL_HOST = "127.0.0.1"
+$env:MYSQL_PORT = "3306"
+$env:MYSQL_USER = "root"
+$env:MYSQL_PASSWORD = "your_password"
+$env:MYSQL_DATABASE = "your_db"
+```
+
+2) 쿼리 실행 → TSV 추출 → CSV 변환
+
+```powershell
+./scripts/export_mysql.ps1 -QueryFile "scripts/sql/extract_mysql.sql" -OutputCsv "data/raw/from_mysql.csv"
+```
 
 ## 어떤 DB인지 알려주면 더 딱 맞게 만들어드릴 수 있어요
 - PostgreSQL: `\copy (...) to 'file.csv' csv header`
