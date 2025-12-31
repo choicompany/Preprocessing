@@ -1,19 +1,21 @@
--- MySQL 추출 템플릿
--- 목적: 필요한 컬럼/행만 뽑아서 로컬에서 CSV로 쓰기 위한 쿼리
+-- 실제 사용 예시: raw_data + match_info 조인
+-- raw_data에서 match 정보를 붙여서 분석용 데이터 생성
 
--- 예시 1) 전체
--- SELECT * FROM your_table;
+SELECT 
+  r.*,
+  m.season_name,
+  m.competition_name,
+  m.game_date,
+  m.home_team_name_ko,
+  m.away_team_name_ko,
+  m.home_score,
+  m.away_score
+FROM raw_data r
+LEFT JOIN match_info m ON r.game_id = m.game_id
+WHERE 1=1
+  -- 필요하면 필터 추가 (예: 특정 시즌, 특정 팀만)
+  -- AND m.season_name = '2024'
+  -- AND r.team_name_ko = '울산 HD FC'
+  -- AND r.type_name IN ('패스', '슛')
+LIMIT 100000;  -- 테스트용 제한, 실제론 제거하거나 늘리기
 
--- 예시 2) 기간 필터
--- SELECT
---   col1,
---   col2,
---   created_at
--- FROM your_table
--- WHERE created_at >= '2025-01-01'
---   AND created_at <  '2026-01-01';
-
--- 예시 3) 조인
--- SELECT a.*, b.some_feature
--- FROM table_a a
--- JOIN table_b b ON b.id = a.b_id;
