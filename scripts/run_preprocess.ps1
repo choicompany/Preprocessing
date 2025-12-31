@@ -11,7 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$python = "python"
+$python = "py"
 
 $argList = @(
   "src/preprocess.py",
