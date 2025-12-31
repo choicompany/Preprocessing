@@ -6,7 +6,7 @@ param(
   [string]$TableName,
 
   [string]$Database = $env:MYSQL_DATABASE,
-  [string]$Host = $env:MYSQL_HOST,
+  [string]$Hostname = $env:MYSQL_HOSTNAME,
   [int]$Port = $(if ($env:MYSQL_PORT) { [int]$env:MYSQL_PORT } else { 3306 }),
   [string]$User = $env:MYSQL_USER,
   [string]$Password = $env:MYSQL_PASSWORD,
@@ -20,28 +20,27 @@ param(
 $ErrorActionPreference = "Stop"
 
 if (-not (Test-Path $CsvPath)) { throw "CsvPath not found: $CsvPath" }
-if (-not $Host) { throw "MYSQL_HOST is required (or -Host)" }
+if (-not $Hostname) { throw "MYSQL_HOSTNAME is required (or -Hostname)" }
 if (-not $User) { throw "MYSQL_USER is required (or -User)" }
 if (-not $Database) { throw "MYSQL_DATABASE is required (or -Database)" }
 
-# 비밀번호는 커맨드라인에 남기지 않도록 환경변수로만 전달
-if ($Password) {
-  $env:MYSQL_PWD = $Password
-}
-
-$python = "python"
-& $python "scripts/generate_mysql_load_sql.py" --csv $CsvPath --table $TableName --database $Database --out $SqlOut --encoding $Encoding --lines-terminated-by $LinesTerminatedBy
-
-$mysqlArgs = @(
-  "--host=$Host",
-  "--port=$Port",
-  "--user=$User",
-  "--database=$Database",
-  "--default-character-set=utf8mb4",
-  "--local-infile=1"
+$python = "py"
+$args = @(
+  "scripts/import_mysql_pandas.py",
+  "--csv", $CsvPath,
+  "--table", $TableName,
+  "--database", $Database,
+  "--hostname", $Hostname,
+  "--port", $Port,
+  "--user", $User,
+  "--password", $Password,
+  "--encoding", $Encoding
 )
 
-Get-Content -Raw -Path $SqlOut | mysql @mysqlArgs
+if ($LinesTerminatedBy) {
+  # pandas 방식에서는 LinesTerminatedBy 불필요 (자동 처리)
+}
+
+& $python @args
 
 Write-Host "Loaded CSV into $Database.$TableName"
-Write-Host "SQL used: $SqlOut"
