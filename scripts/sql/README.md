@@ -8,6 +8,19 @@
 3. 추출된 CSV를 `data/raw/`에 저장(로컬)
 4. `scripts/run_preprocess.ps1`로 전처리 실행
 
+## 적재 흐름(옵션): 로컬 MySQL에 CSV 넣기
+큰 CSV를 Git에 두기 싫으면, 로컬/서버 MySQL에 적재해두고 필요할 때 SQL로 뽑는 방식도 많이 씁니다.
+
+```powershell
+$env:MYSQL_HOST = "127.0.0.1"
+$env:MYSQL_USER = "admin"  # 예시
+$env:MYSQL_PASSWORD = "***" # 환경변수로만 두세요(커밋/스크립트에 하드코딩 금지)
+$env:MYSQL_DATABASE = "preprocessing"
+
+./scripts/import_mysql.ps1 -CsvPath "data/raw/match_info.csv" -TableName "match_info"
+./scripts/import_mysql.ps1 -CsvPath "data/raw/raw_data.csv"  -TableName "raw_data" -LinesTerminatedBy "\r\n"
+```
+
 ### MySQL 로컬 CSV 추출 예시
 
 1) 환경변수 세팅(비밀번호는 커맨드 히스토리에 남지 않게 환경변수 권장)
