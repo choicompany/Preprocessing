@@ -94,3 +94,6 @@ SELECT rd.player_name_ko,
 FROM raw_data rd
 JOIN match_info mi ON rd.game_id = mi.game_id
 GROUP BY rd.player_name_ko, rd.type_name;
+
+--======================================================= 
+SELECT r.*, m.* FROM raw_data r, match_info m;
